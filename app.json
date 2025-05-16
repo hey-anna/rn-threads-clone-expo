@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "threads",
-    "slug": "threads",
+    "name": "threads-clone",
+    "slug": "threads-clone",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.heyanna.threads"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b4327ca0-9ca1-4370-8eb1-56988bddb992"
+      }
     }
   }
 }
