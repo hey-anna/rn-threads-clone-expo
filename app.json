@@ -2,6 +2,7 @@
   "expo": {
     "name": "threads-clone",
     "slug": "threads-clone",
+    "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +10,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.heyanna.threads",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -42,8 +47,15 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "b4327ca0-9ca1-4370-8eb1-56988bddb992"
+        "projectId": "b8a9e037-8e52-472b-8a94-d39e3bd12991"
       }
+    },
+    "owner": "hey-anna",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b8a9e037-8e52-472b-8a94-d39e3bd12991"
     }
   }
 }
