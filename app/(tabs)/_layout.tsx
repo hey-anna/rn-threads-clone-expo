@@ -14,7 +14,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
           tabBarLabel: () => null,
           tabBarIcon: ({ focused }) => <Ionicons name="home" size={24} color={focused ? "black" : "gray"} />,
@@ -55,6 +55,19 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => <Ionicons name="person-outline" size={24} color={focused ? "black" : "gray"} />,
         }}
       />
+      <Tabs.Screen
+        name="(post)/[username]/post/[postID]"
+        options={{
+          href: null,
+        }}
+      />
+      {/* <Tabs.Screen
+        name="following"
+        options={{
+          tabBarLabel: () => null,
+          href: null, // following 네비바에서 없애기
+        }}
+      /> */}
     </Tabs>
   );
 }
