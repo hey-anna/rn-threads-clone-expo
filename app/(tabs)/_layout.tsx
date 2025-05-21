@@ -1,8 +1,53 @@
 // afterLogin이 아닌 외부 레이아웃은 로그인 전 공통 레이아웃 활용
 import { Ionicons } from "@expo/vector-icons";
+import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { Tabs, useRouter } from "expo-router";
-import { useState } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { useRef, useState } from "react";
+import { Animated, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
+
+// Animated.delay // 앞에 한거 끝난뒤에 얼마나 간격을 줄지
+// Animated.parallel // 동시에 하는거
+// Animated.sequence // 순차적으로 하는거
+// Animated.stagger // parallel + delay 섞어놓은거, 정해진 시간마다 하나씩 실행 // 앞뒤 상관없이 실행될 수 있다
+
+const AnimatedTabBarButton = ({
+  children,
+  onPress,
+  style,
+  ...restProps // 세개의 props만 꺼낼때
+}: BottomTabBarButtonProps) => {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressOut = () => {
+    Animated.sequence([
+      Animated.spring(scaleValue, {
+        toValue: 1.2,
+        useNativeDriver: true, // 이거를 켜둬야지 자바스크립트 스레드가 아니라 GPT 같은 걸 사용해서 자바스크립트 블로킹 스레드없이 사용할 수있기 때문에 , 애니메이션이 헤비한 작업이기때문에 왠마하면 켜두는게 좋다
+        speed: 200,
+        // friction: 4, // 높을 수록 스프링 효과가 적다 friction speed 같이 못쓴다
+      }),
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 200,
+      }),
+    ]).start();
+  };
+
+  return (
+    <Pressable
+      {...restProps}
+      onPress={onPress} // 클릭하는것
+      // onPressIn={handlePressIn} // 마우스 다운 누를때
+      onPressOut={handlePressOut} // 뗄때
+      style={[{ flex: 1, justifyContent: "center", alignItems: "center" }, style]}
+      // Disable Android ripple effect (안드로이드 기본 물결 퍼져나가는것을 없애준다)
+      android_ripple={{ borderless: false, radius: 0 }}
+    >
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>{children}</Animated.View>
+    </Pressable>
+  );
+};
 
 export default function TabLayout() {
   const router = useRouter();
@@ -25,6 +70,7 @@ export default function TabLayout() {
         backBehavior="history"
         screenOptions={{
           headerShown: false,
+          tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
         }}
       >
         <Tabs.Screen
