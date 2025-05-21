@@ -14,8 +14,13 @@ const AnimatedTabBarButton = ({
   children,
   onPress,
   style,
-  ...restProps // 세개의 props만 꺼낼때
-}: BottomTabBarButtonProps) => {
+  accessibilityState,
+  accessibilityLabel,
+  testID,
+  android_ripple, // 따로 꺼냄
+  onLongPress, // 따로 꺼냄
+}: // ...restProps // 세개의 props만 꺼낼때 나머지
+BottomTabBarButtonProps) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressOut = () => {
@@ -33,16 +38,22 @@ const AnimatedTabBarButton = ({
       }),
     ]).start();
   };
-
+  // console.log("restProps", restProps);
+  // console.log("AnimatedTabBarButton props", { children, onPress, style, ...restProps });
   return (
     <Pressable
-      {...restProps}
+      // {...restProps} // 삭제 처리
       onPress={onPress} // 클릭하는것
+      onLongPress={onLongPress}
       // onPressIn={handlePressIn} // 마우스 다운 누를때
       onPressOut={handlePressOut} // 뗄때
       style={[{ flex: 1, justifyContent: "center", alignItems: "center" }, style]}
       // Disable Android ripple effect (안드로이드 기본 물결 퍼져나가는것을 없애준다)
-      android_ripple={{ borderless: false, radius: 0 }}
+      // android_ripple={{ borderless: false, radius: 0 }}
+      android_ripple={android_ripple}
+      accessibilityState={accessibilityState}
+      accessibilityLabel={accessibilityLabel}
+      testID={testID}
     >
       <Animated.View style={{ transform: [{ scale: scaleValue }] }}>{children}</Animated.View>
     </Pressable>
