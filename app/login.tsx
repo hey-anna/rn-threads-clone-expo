@@ -1,8 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Redirect, router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-// import * as SecureStore from "expo-secure-store";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { AuthContext } from "./_layout";
 // import { useContext } from "react";
 
@@ -31,6 +31,16 @@ export default function Login() {
       })
       .then((data) => {
         console.log("data", data);
+
+        // 전부다 프로미스라서 프로미스로 묶어준다
+        return Promise.all([
+          SecureStore.setItemAsync("accessToken", data.accessToken), // 비밀
+          SecureStore.setItemAsync("refreshToken", data.refreshToken),
+          AsyncStorage.setItem("user", JSON.stringify(data.user)), // 문자열만 됨
+        ]);
+      })
+      .then(() => {
+        router.push("/(tabs)");
       })
       .catch((error) => {
         console.error(error);

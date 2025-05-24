@@ -30,7 +30,7 @@ if (__DEV__) {
             user: {
               id: "heyanna",
               name: "heyanna",
-              description: "🐢 lover, programmer, youtuber",
+              description: "Sonny lover, programmer, blogger",
               profileImageUrl: "https://avatars.githubusercontent.com/u/885857?v=4",
             },
           };
