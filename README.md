@@ -68,6 +68,7 @@ npx expo install expo-blur
 npx expo install expo-location
 npx expo install expo-image-picker
 npx expo install expo-media-library
+yarn add --dev miragejs
 ```
 
 ---

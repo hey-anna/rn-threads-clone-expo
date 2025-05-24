@@ -62,7 +62,7 @@ BottomTabBarButtonProps) => {
 
 export default function TabLayout() {
   const router = useRouter();
-  const isLoggedIn = true; // 로그인 여부 판단
+  const isLoggedIn = false; // 로그인 여부 판단
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const openLoginModal = () => {
@@ -71,6 +71,12 @@ export default function TabLayout() {
 
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
+  };
+
+  // 로그인 모달
+  const toLoginPage = () => {
+    setIsLoginModalOpen(false);
+    router.push("/login");
   };
 
   // 커스텀 아이징
@@ -171,7 +177,9 @@ export default function TabLayout() {
           }}
         >
           <View style={{ backgroundColor: "white", padding: 20 }}>
-            <Text>Login Modal</Text>
+            <Pressable onPress={toLoginPage}>
+              <Text>Login Modal</Text>
+            </Pressable>
             <TouchableOpacity onPress={closeLoginModal}>
               <Ionicons name="close" size={24} color="#555" />
             </TouchableOpacity>
