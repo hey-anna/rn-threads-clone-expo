@@ -1,5 +1,7 @@
 import { FontAwesome, FontAwesome6, Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -9,6 +11,7 @@ import {
   Linking,
   Platform,
   Pressable,
+  Modal as RNModal,
   StyleSheet,
   Text,
   TextInput,
@@ -108,21 +111,114 @@ export default function Modal() {
   // 마지막거 텍스트의 길이가 0보다 큰지로 판단
   // 마지막 Thread에 텍스트 길이가 차 있으면
   // 괄호까지 묶어줘야 확실히 불리언이 된다
-  const canAddThread = (threads.at(-1)?.text.trim().length ?? 0) > 0;
+  const canAddThread = (threads.at(-1)?.text.trim().length ?? 0) > 0 || (threads.at(-1)?.imageUris.length ?? 0) > 0; // 텍스트 확인, 널리싱 퀄리싱을 해줘야한다
 
   // 모든 쓰레드의 텍스트가 가득차 있을때 되게
-  const canPost = threads.every((thread) => thread.text.trim().length > 0);
+  const canPost = threads.every((thread) => thread.text.trim().length > 0 || thread.imageUris.length > 0);
+  // 이미지를 하나라도 올렸는지 또는 이미지를 올올린경우에도 다음스레드를 추가할 수 있게 해야 한다
 
   // 필터로 해당아이템 지우기
   const removeThread = (id: string) => {
     setThreads((prevThreads) => prevThreads.filter((thread) => thread.id !== id));
   };
 
-  const pickImage = async (id: string) => {};
+  // 이미지 피커 (이미지 라이브러리 불러오고)
 
-  const takePhoto = async (id: string) => {};
+  // allowsEditing 이미지 선택뒤에 크롭하거나 기울이거나
+  // aspect 편집 비율
+  // quality 이미지 압축 옵션
+  // 미디어 타입
+  // exif : 메타데이터 같은거, 사진찍은 GPS 위도 경도, 카메라 뒤짚어 찍었는지 가로? 왼쪽가로 오른쪽가로? 정보
+  // Base64는 이미지를 Base64로 받을지 스트링으로 받을지 - 우린 필요없음
+  // 우리는 이미지 경로만 받으면 그게 알아서 자동으로 업로드
+  // 비디오 옵션들도 있다
+  // allowsMultipleSelection 이미지 여러개 true 선언
+  // selectionLimit 이미지를 몇개 부를지
 
-  const removeImageFromThread = (id: string, uriToRemove: string) => {};
+  const pickImage = async (id: string) => {
+    let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); // 옵션 볼 수 있음
+    if (status !== "granted") {
+      Alert.alert("Photos permission not granted", "Please grant photos permission to use this feature", [
+        { text: "Open settings", onPress: () => Linking.openSettings() }, // 권한이 없으면 똑같이 세팅을 보내주면 된다
+        {
+          text: "Cancel",
+        },
+      ]);
+      return;
+    }
+    // 권한을 얻은 경우에
+    // 여기가
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "livePhotos", "videos"], // livePhotos는 이미지인데 앞에 0.5초 정도 움직이는
+      allowsMultipleSelection: true, // 여러개 고르고
+      selectionLimit: 5, // 이미지 다섯개
+    });
+    console.log("image result", result);
+
+    if (!result.canceled) {
+      // 유저가 캔슬하지 않은 상황에서만 (result canceled 한번 감싸주면 좋다잉)
+      setThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread.id === id
+            ? {
+                ...thread,
+                imageUris: thread.imageUris.concat(result.assets?.map((asset) => asset.uri) ?? []), // 기존 스레드를 찾아서 assets안에
+              }
+            : thread
+        )
+      );
+    }
+  };
+
+  // 테커 포토 (카메라 가져오고)
+  const takePhoto = async (id: string) => {
+    let { status } = await ImagePicker.requestCameraPermissionsAsync(); // 미디어 라이브러리 권한을 얻어준다
+    if (status !== "granted") {
+      // 권한을 얻은 경우에만 Alert 띄우기
+      Alert.alert("Camera permission not granted", "Please grant camera permission to use this feature", [
+        { text: "Open settings", onPress: () => Linking.openSettings() },
+        {
+          text: "Cancel",
+        },
+      ]);
+      return;
+    }
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images", "livePhotos", "videos"],
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+    });
+    console.log("camera result", result);
+    // setThreads((prevThreads) =>
+    //   prevThreads.map((thread) =>
+    //     thread.id === id
+    //       ? {
+    //           ...thread,
+    //           imageUris: thread.imageUris.concat(result.assets?.map((asset) => asset.uri) ?? []), // 기존 스레드를 찾아서 assets안에
+    //         }
+    //       : thread
+    //   )
+    // );
+
+    status = (await MediaLibrary.requestPermissionsAsync()).status; // 저장권한을 얻었고,
+    if (status === "granted" && result.assets?.[0].uri) {
+      // 사진도 존재하는 경우에는 미디어 라이브러리에 저장
+      MediaLibrary.saveToLibraryAsync(result.assets[0].uri);
+    }
+  };
+  const removeImageFromThread = (id: string, uriToRemove: string) => {
+    // id와 uri 받아서 일치하는 uri 제거
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === id
+          ? {
+              ...thread,
+              imageUris: thread.imageUris.filter((uri) => uri !== uriToRemove),
+            }
+          : thread
+      )
+    );
+  };
 
   // granted : 권한 있는거
 
@@ -145,15 +241,14 @@ export default function Modal() {
       ]);
       return;
     }
-
     const location = await Location.getCurrentPositionAsync({}); // 권한을 받은 경우 뜨면
-    const address = await Location.reverseGeocodeAsync({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      // latitude:37.53,
-      // longitude:127.02
-    });
-    console.log("address", address);
+    // const address = await Location.reverseGeocodeAsync({
+    //   latitude: location.coords.latitude,
+    //   longitude: location.coords.longitude,
+    //   // latitude:37.53,
+    //   // longitude:127.02
+    // });
+    // console.log("address", address);
     setThreads((prevThreads) =>
       prevThreads.map((thread) =>
         thread.id === id
@@ -299,6 +394,8 @@ export default function Modal() {
     </View>
   );
 
+  // RM Modal
+  const replyOptions = ["Anyone", "Profiles you follow", "Mentioned only"];
   useEffect(() => {
     console.log("현재 threads 상태", threads);
   }, [threads]);
@@ -332,6 +429,32 @@ export default function Modal() {
         contentContainerStyle={{ backgroundColor: "#ddd" }} // 감싸는 영역 꾸미는거
         keyboardShouldPersistTaps="handled" // 마이너속성, 눌렀을때 키보드뜨고, 바깥누르면 키보드 내리고
       />
+      {/* RN modal */}
+      <RNModal
+        transparent={true}
+        visible={isDropdownVisible}
+        animationType="fade"
+        onRequestClose={() => setIsDropdownVisible(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setIsDropdownVisible(false)}>
+          <View style={[styles.dropdownContainer, { bottom: insets.bottom + 30 }]}>
+            {replyOptions.map((option) => (
+              <Pressable
+                key={option}
+                style={[styles.dropdownOption, option === replyOption && styles.selectedOption]}
+                onPress={() => {
+                  setReplyOption(option); // 선택한거는 여기 저장
+                  setIsDropdownVisible(false);
+                }}
+              >
+                <Text style={[styles.dropdownOptionText, option === replyOption && styles.selectedOptionText]}>
+                  {option}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </RNModal>
       <View style={[styles.footer, { paddingBottom: insets.bottom + 10 }]}>
         <Pressable onPress={() => setIsDropdownVisible(true)}>
           <Text style={styles.footerText}>{replyOption} can reply & quote</Text>

@@ -30,7 +30,9 @@ React Native + Expo 기반으로 구성되어 있으며, 실습을 통해 앱 �
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `react-native-safe-area-context` | 기기 노치, 상태바, 홈 인디케이터 등을 피해서 콘텐츠를 안전하게 배치할 수 있도록 도와주는 Safe Area 관련 라이브러리 (`SafeAreaView`, `useSafeAreaInsets()`) |
 | `expo-blur`                      | 화면 뒤 배경이 비쳐 보이도록 블러 처리할 수 있는 라이브러리 (`BlurView`)                                                                                   |
-| `expo-location`                  | 사용자의 위치 정보를 가져올 수 있는 라이브러리 (getCurrentPositionAsync, requestForegroundPermissionsAsync 등)                                             |
+| `expo-location`                  | 사용자의 위치 정보를 가져올 수 있는 라이브러리 (`getCurrentPositionAsync`, `requestForegroundPermissionsAsync` 등)                                         |
+| `expo-image-picker`              | 기기 내 사진 및 카메라 접근을 통해 이미지 선택/촬영 기능을 제공하는 라이브러리 (`launchImageLibraryAsync`, `launchCameraAsync` 등)                         |
+| `expo-media-library`             | 촬영한 이미지나 비디오를 기기 내 갤러리에 저장하거나 접근할 수 있게 해주는 라이브러리 (`saveToLibraryAsync`, 권한 요청 등 포함)                            |
 
 ---
 
@@ -64,6 +66,8 @@ eas build --platform android --profile development
 npx expo install react-native-safe-area-context
 npx expo install expo-blur
 npx expo install expo-location
+npx expo install expo-image-picker
+npx expo install expo-media-library
 ```
 
 ---
