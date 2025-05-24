@@ -1,7 +1,17 @@
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  FlatList,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Thread {
@@ -36,18 +46,20 @@ export function ListFooter({
 
 export default function Modal() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [threads, setThreads] = useState<Thread[]>([{ id: Date.now().toString(), text: "", imageUris: [] }]);
   // 여기 지금 빠져 있는게 해시태그랑 위치정보 Location 이거까지 들어 있을 수 있다
   // Thread를 한번에 여러개 올릴 수 있어서 Thread[]로 해둠
   // ID는 지금 현재 시간이지만, 실무에서는 당연히 고유값을 넣어줘야 한다 - UUID , 나노ID 이런거 고유한 값으로 만들어야 겹치지 않는다
 
-  const insets = useSafeAreaInsets();
+  const [selectedHashtagThreadId, setSelectedHashtagThreadId] = useState<string | null>(null);
+  const [hashtagInput, setHashtagInput] = useState<string>("");
+  const [toast, setToast] = useState<string | null>(null);
+
   const [replyOption, setReplyOption] = useState("Anyone");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
-
-  const replyOptions = ["Anyone", "Profiles you follow", "Mentioned only"];
 
   const handleCancel = () => {
     if (isPosting) return;
@@ -56,9 +68,38 @@ export default function Modal() {
 
   const handlePost = () => {};
 
-  // 글자 쳤을때 글자 들어가게
+  // hashtag input
+  // const updateThreadText = (id: string, text: string) => {
+  //   setThreads((prevThreads) => prevThreads.map((thread) => (thread.id === id ? { ...thread, text } : thread)));
+  // };
+
+  // hashtag input 2
   const updateThreadText = (id: string, text: string) => {
-    setThreads((prevThreads) => prevThreads.map((thread) => (thread.id === id ? { ...thread, text } : thread)));
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) => {
+        if (thread.id !== id) return thread;
+
+        const shouldClearHashtag = thread.hashtag && !text.includes(`${thread.hashtag}`);
+        return {
+          ...thread,
+          text,
+          ...(shouldClearHashtag ? { hashtag: undefined } : {}), // hashtag도 같이 지움
+        };
+      })
+    );
+  };
+
+  const insertHashtag = (id: string, tag: string) => {
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === id ? { ...thread, text: `${thread.text.trim()} #${tag}`, hashtag: tag } : thread
+      )
+    );
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2000);
   };
 
   // 마지막거 텍스트의 길이가 0보다 큰지로 판단
@@ -81,24 +122,6 @@ export default function Modal() {
   const removeImageFromThread = (id: string, uriToRemove: string) => {};
 
   const getMyLocation = async (id: string) => {};
-  // const getMyLocation = async (id: string) => {
-  //   // let { status } = await Location.requestForegroundPermissionsAsync();
-  //   console.log("getMyLocation", status);
-  //   if (status !== "granted") {
-  //     Alert.alert("Location permission not granted", "Please grant location permission to use this feature", [
-  //       {
-  //         text: "Open settings",
-  //         onPress: () => {
-  //           Linking.openSettings();
-  //         },
-  //       },
-  //       {
-  //         text: "Cancel",
-  //       },
-  //     ]);
-  //     return;
-  //   }
-  // };
 
   const renderThreadItem = ({
     item, // props
@@ -129,6 +152,7 @@ export default function Modal() {
             </TouchableOpacity>
           )}
         </View>
+        {/* 일반 텍스트 입력폼 */}
         <TextInput
           style={styles.input}
           placeholder={"What's new?"}
@@ -137,6 +161,35 @@ export default function Modal() {
           onChangeText={(text) => updateThreadText(item.id, text)}
           multiline // 여러줄 칠 수 있게 해줌, 기본은 한줄만 가능
         />
+        {item.hashtag && <Text style={styles.hashtagPreview}>#{item.hashtag}</Text>}
+        {/* 태그 입력 폼 */}
+        {selectedHashtagThreadId === item.id && (
+          <View style={styles.hashtagContainer}>
+            <TextInput
+              // style={styles.input}
+              style={{ flex: 1, borderBottomWidth: 1, borderColor: "#ccc" }}
+              placeholder="Enter a tag"
+              value={hashtagInput}
+              onChangeText={setHashtagInput}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                if (!isPosting && hashtagInput.trim()) {
+                  insertHashtag(item.id, hashtagInput.trim());
+
+                  const updated = threads.find((t) => t.id === item.id);
+                  console.log("updated", updated);
+
+                  setHashtagInput("");
+                  setSelectedHashtagThreadId(null);
+                }
+              }}
+              // style={{ marginLeft: 8 }}
+            >
+              <Text>Add</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {/* 나중에 이미지 넣을때 필요한 FlatList */}
         {item.imageUris && item.imageUris.length > 0 && (
           <FlatList
@@ -180,10 +233,28 @@ export default function Modal() {
           >
             <FontAwesome name="map-marker" size={24} color="#777" />
           </Pressable>
+          <Pressable
+            style={styles.actionButton}
+            onPress={() => {
+              const thread = threads.find((t) => t.id === item.id);
+              if (thread?.hashtag) {
+                showToast("태그 한도에 도달함(1개)");
+                return;
+              }
+              setSelectedHashtagThreadId(item.id); // 어떤 thread에 추가할건지 설정
+              setHashtagInput(""); // 입력 초기화
+            }}
+          >
+            <FontAwesome6 name="hashtag" size={24} color="#777" />
+          </Pressable>
         </View>
       </View>
     </View>
   );
+
+  useEffect(() => {
+    console.log("현재 threads 상태", threads);
+  }, [threads]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -194,7 +265,6 @@ export default function Modal() {
         <Text style={styles.title}>New thread</Text>
         <View style={styles.headerRightPlaceholder} />
       </View>
-
       <FlatList
         data={threads}
         keyExtractor={(item) => item.id} // 리액트 map 사용시 key 넣어줘야 한다 - FlatList 여기서는 이것으로 고유한 값 추출해서 키로 사용하겠다
@@ -227,6 +297,11 @@ export default function Modal() {
           <Text style={styles.postButtonText}>Post</Text>
         </Pressable>
       </View>
+      {toast && (
+        <View style={[styles.toast, { top: insets.top + 12 }]}>
+          <Text style={styles.toastText}>{toast}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -313,6 +388,11 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     minHeight: 24,
     lineHeight: 20,
+    // fontFamily: Platform.select({
+    //   ios: "Apple SD Gothic Neo",
+    //   android: "sans-serif",
+    //   default: "System",
+    // }),
   },
   actionButtons: {
     flexDirection: "row",
@@ -424,5 +504,46 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 14,
     color: "#8e8e93",
+  },
+  // 추가
+  hashtagContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  hashtag: {
+    color: "skyblue",
+  },
+  hashtagPreview: {
+    color: "#18a3fe",
+    marginTop: 4,
+    fontSize: 14,
+  },
+  toast: {
+    position: "absolute",
+    top: 0,
+    backgroundColor: "#e5484d",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    zIndex: 10,
+    maxWidth: "80%",
+    alignSelf: "center",
+    borderRadius: 16,
+    elevation: 10, // 안드로이드용 그림자
+    ...Platform.select({
+      ios: {
+        // iOS 그림자
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+    }),
+  },
+  toastText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
   },
 });

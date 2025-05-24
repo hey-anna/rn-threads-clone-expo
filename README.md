@@ -77,6 +77,7 @@ npx expo install expo-blur
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 - [file-based routing](https://docs.expo.dev/router/introduction)
+- [Expo Icons Explorer](https://icons.expo.fyi/) – `@expo/vector-icons` 아이콘 검색
 
 ---
 
