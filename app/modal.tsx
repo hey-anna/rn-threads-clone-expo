@@ -1,9 +1,12 @@
 import { FontAwesome, FontAwesome6, Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
+  Linking,
   Platform,
   Pressable,
   StyleSheet,
@@ -73,7 +76,7 @@ export default function Modal() {
   //   setThreads((prevThreads) => prevThreads.map((thread) => (thread.id === id ? { ...thread, text } : thread)));
   // };
 
-  // hashtag input 2
+  // hashtag input
   const updateThreadText = (id: string, text: string) => {
     setThreads((prevThreads) =>
       prevThreads.map((thread) => {
@@ -121,8 +124,49 @@ export default function Modal() {
 
   const removeImageFromThread = (id: string, uriToRemove: string) => {};
 
-  const getMyLocation = async (id: string) => {};
+  // granted : 권한 있는거
 
+  // 위도 경도 지도 위치
+  const getMyLocation = async (id: string) => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    console.log("getMyLocation", status);
+    if (status !== "granted") {
+      // 제목 - 상세 - onPress 순 만들기
+      Alert.alert("Location permission not granted", "Please grant location permission to use this feature", [
+        {
+          text: "Open settings",
+          onPress: () => {
+            Linking.openSettings(); // 권한 실패시
+          },
+        },
+        {
+          text: "Cancel",
+        },
+      ]);
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({}); // 권한을 받은 경우 뜨면
+    const address = await Location.reverseGeocodeAsync({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      // latitude:37.53,
+      // longitude:127.02
+    });
+    console.log("address", address);
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === id
+          ? {
+              ...thread,
+              location: [location.coords.latitude, location.coords.longitude], // 이거 추가해주면 위치정보 받아온다
+            }
+          : thread
+      )
+    );
+  };
+
+  // renderThreadItem
   const renderThreadItem = ({
     item, // props
     index, // props 받아서
@@ -162,7 +206,7 @@ export default function Modal() {
           multiline // 여러줄 칠 수 있게 해줌, 기본은 한줄만 가능
         />
         {item.hashtag && <Text style={styles.hashtagPreview}>#{item.hashtag}</Text>}
-        {/* 태그 입력 폼 */}
+        {/* 태그 입력 폼 및 추가 버튼 */}
         {selectedHashtagThreadId === item.id && (
           <View style={styles.hashtagContainer}>
             <TextInput
@@ -211,6 +255,8 @@ export default function Modal() {
             style={styles.imageFlatList}
           />
         )}
+
+        {/* 위치 S : 위도 경도만 보여주겠다 */}
         {item.location && (
           <View style={styles.locationContainer}>
             <Text style={styles.locationText}>
@@ -218,6 +264,7 @@ export default function Modal() {
             </Text>
           </View>
         )}
+        {/* 위치 E */}
         <View style={styles.actionButtons}>
           <Pressable style={styles.actionButton} onPress={() => !isPosting && pickImage(item.id)}>
             <Ionicons name="image-outline" size={24} color="#777" />
@@ -497,15 +544,8 @@ const styles = StyleSheet.create({
     marginRight: 20,
     paddingTop: 2,
   },
-  locationContainer: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  locationText: {
-    fontSize: 14,
-    color: "#8e8e93",
-  },
-  // 추가
+
+  // 추가 S
   hashtagContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -545,5 +585,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "500",
+  },
+  // 추가 E
+  // 지도
+
+  locationContainer: {
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  locationText: {
+    fontSize: 14,
+    color: "#8e8e93",
   },
 });
