@@ -23,7 +23,7 @@ if (__DEV__) {
         const { username, password } = JSON.parse(request.requestBody);
 
         // 아이디와 비밀번호가 일치하면 이정보들은 넘겨주고
-        if (username === "zerocho" && password === "1234") {
+        if (username === "heyanna" && password === "1234") {
           return {
             accessToken: "access-token",
             refreshToken: "refresh-token",

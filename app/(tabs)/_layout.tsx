@@ -2,9 +2,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { Tabs, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Animated, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
-
+import { AuthContext } from "../_layout";
 // Animated.delay // 앞에 한거 끝난뒤에 얼마나 간격을 줄지
 // Animated.parallel // 동시에 하는거
 // Animated.sequence // 순차적으로 하는거
@@ -62,7 +62,9 @@ BottomTabBarButtonProps) => {
 
 export default function TabLayout() {
   const router = useRouter();
-  const isLoggedIn = false; // 로그인 여부 판단
+  const { user } = useContext(AuthContext);
+  const isLoggedIn = !!user; // 유저가 있냐 없냐 판단
+  console.log("user", user, "isLoggedIn", isLoggedIn);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const openLoginModal = () => {
