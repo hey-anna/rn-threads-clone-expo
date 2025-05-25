@@ -1,5 +1,4 @@
 import "expo-router/entry";
-
 import { createServer, Response, Server } from "miragejs";
 
 // 타입스크립트에 윈도우라는 타입에 서버라는걸 추가하는 문법 : 타입에러 없애기 위한것
@@ -16,7 +15,6 @@ if (__DEV__) {
   }
 
   // (schema, request) 매개변수 로 requestBody를 받아 올 수 있다
-
   window.server = createServer({
     routes() {
       this.post("/login", (schema, request) => {

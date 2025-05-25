@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router"; // modal option presentation이 tab에서 안되고 Stack에서만 된다
 import * as SecureStore from "expo-secure-store";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 interface User {
@@ -60,6 +60,17 @@ export default function RootLayout() {
       AsyncStorage.removeItem("user"),
     ]);
   };
+
+  // 앱을 껏다가 켜도 로그인이 유지되어야 한다
+  // 유지하기 위해
+  // 만약 AsyncStorage에 유저가 있다면 setUser 해주기
+  useEffect(() => {
+    AsyncStorage.getItem("user").then((user) => {
+      setUser(user ? JSON.parse(user) : null);
+    });
+    // TODO: validating access token - 엑세스 토큰이 유효한지 검사 추천(캐시, 한달 만료, 검사만료, 유저없애주기)
+    // 앱 켤때마다 AsyncStorage 그대로 가져다 쓰되 검사는 꼭 한번 해보세요
+  }, []);
 
   return (
     <AuthContext value={{ user, login, logout }}>
