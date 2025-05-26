@@ -26,16 +26,18 @@ React Native + Expo 기반으로 구성되어 있으며, 실습을 통해 앱 �
 
 #### 🎨 스타일 라이브러리
 
-| 라이브러리                       | 설명                                                                                                                                                       |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `react-native-safe-area-context` | 기기 노치, 상태바, 홈 인디케이터 등을 피해서 콘텐츠를 안전하게 배치할 수 있도록 도와주는 Safe Area 관련 라이브러리 (`SafeAreaView`, `useSafeAreaInsets()`) |
-| `expo-blur`                      | 화면 뒤 배경이 비쳐 보이도록 블러 처리할 수 있는 라이브러리 (`BlurView`)                                                                                   |
-| `expo-location`                  | 사용자의 위치 정보를 가져올 수 있는 라이브러리 (`getCurrentPositionAsync`, `requestForegroundPermissionsAsync` 등)                                         |
-| `expo-image-picker`              | 기기 내 사진 및 카메라 접근을 통해 이미지 선택/촬영 기능을 제공하는 라이브러리 (`launchImageLibraryAsync`, `launchCameraAsync` 등)                         |
-| `expo-media-library`             | 촬영한 이미지나 비디오를 기기 내 갤러리에 저장하거나 접근할 수 있게 해주는 라이브러리 (`saveToLibraryAsync`, 권한 요청 등 포함)                            |
-| `miragejs`                       | 실제 서버 없이도 API 요청을 테스트할 수 있게 도와주는 개발용 모킹 서버(createServer, Response 등) 라이브러리                                               |
-| `async-storage`                  | 앱 내에 간단한 key-value 데이터를 비동기적으로 저장할 수 있는 로컬 스토리지 라이브러리 (AsyncStorage)                                                      |
-| `expo-secure-store`              | 민감한 정보를 암호화된 방식으로 안전하게 저장할 수 있는 보안 스토리지 라이브러리 (getItemAsync, setItemAsync 등)                                           |
+| 라이브러리                            | 설명                                                                                                                                                       |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `react-native-safe-area-context`      | 기기 노치, 상태바, 홈 인디케이터 등을 피해서 콘텐츠를 안전하게 배치할 수 있도록 도와주는 Safe Area 관련 라이브러리 (`SafeAreaView`, `useSafeAreaInsets()`) |
+| `expo-blur`                           | 화면 뒤 배경이 비쳐 보이도록 블러 처리할 수 있는 라이브러리 (`BlurView`)                                                                                   |
+| `expo-location`                       | 사용자의 위치 정보를 가져올 수 있는 라이브러리 (`getCurrentPositionAsync`, `requestForegroundPermissionsAsync` 등)                                         |
+| `expo-image-picker`                   | 기기 내 사진 및 카메라 접근을 통해 이미지 선택/촬영 기능을 제공하는 라이브러리 (`launchImageLibraryAsync`, `launchCameraAsync` 등)                         |
+| `expo-media-library`                  | 촬영한 이미지나 비디오를 기기 내 갤러리에 저장하거나 접근할 수 있게 해주는 라이브러리 (`saveToLibraryAsync`, 권한 요청 등 포함)                            |
+| `miragejs`                            | 실제 서버 없이도 API 요청을 테스트할 수 있게 도와주는 개발용 모킹 서버(createServer, Response 등) 라이브러리                                               |
+| `async-storage`                       | 앱 내에 간단한 key-value 데이터를 비동기적으로 저장할 수 있는 로컬 스토리지 라이브러리 (AsyncStorage)                                                      |
+| `expo-secure-store`                   | 민감한 정보를 암호화된 방식으로 안전하게 저장할 수 있는 보안 스토리지 라이브러리 (getItemAsync, setItemAsync 등)                                           |
+| `@react-navigation/material-top-tabs` | 상단 탭(Top Tabs) 기반의 내비게이션 UI를 구현할 수 있는 React Navigation 공식 탭 라이브러리                                                                |
+| `react-native-pager-view`             | 스와이프 가능한 페이지 뷰를 지원하며, 탭 내비게이션 등에서 페이지 전환 애니메이션을 구현하는 데 필요한 필수 의존성                                         |
 
 ---
 
@@ -74,6 +76,8 @@ npx expo install expo-media-library
 yarn add --dev miragejs
 npx expo install @react-native-async-storage/async-storage
 npx expo install expo-secure-store
+yarn add @react-navigation/material-top-tabs
+yarn add react-native-pager-view
 ```
 
 ---
