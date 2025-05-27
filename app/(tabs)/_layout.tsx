@@ -1,14 +1,9 @@
-// afterLogin이 아닌 외부 레이아웃은 로그인 전 공통 레이아웃 활용
 import { Ionicons } from "@expo/vector-icons";
 import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { Tabs, useRouter } from "expo-router";
 import { useContext, useRef, useState } from "react";
-import { Animated, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Modal, Pressable, Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import { AuthContext } from "../_layout";
-// Animated.delay // 앞에 한거 끝난뒤에 얼마나 간격을 줄지
-// Animated.parallel // 동시에 하는거
-// Animated.sequence // 순차적으로 하는거
-// Animated.stagger // parallel + delay 섞어놓은거, 정해진 시간마다 하나씩 실행 // 앞뒤 상관없이 실행될 수 있다
 
 const AnimatedTabBarButton = ({
   children,
@@ -65,6 +60,7 @@ export default function TabLayout() {
   const { user } = useContext(AuthContext);
   const isLoggedIn = !!user; // 유저가 있냐 없냐 판단
   console.log("user", user, "isLoggedIn", isLoggedIn);
+  const colorScheme = useColorScheme();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const openLoginModal = () => {
@@ -89,6 +85,10 @@ export default function TabLayout() {
         backBehavior="history"
         screenOptions={{
           headerShown: false,
+          tabBarStyle: {
+            backgroundColor: colorScheme === "dark" ? "#101010" : "white",
+            borderTopWidth: 0,
+          },
           tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
         }}
       >
@@ -96,14 +96,22 @@ export default function TabLayout() {
           name="(home)"
           options={{
             tabBarLabel: () => null,
-            tabBarIcon: ({ focused }) => <Ionicons name="home" size={24} color={focused ? "black" : "gray"} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons name="home" size={24} color={focused ? (colorScheme === "dark" ? "white" : "black") : "gray"} />
+            ),
           }}
         />
         <Tabs.Screen
           name="search"
           options={{
             tabBarLabel: () => null,
-            tabBarIcon: ({ focused }) => <Ionicons name="search" size={24} color={focused ? "black" : "gray"} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name="search"
+                size={24}
+                color={focused ? (colorScheme === "dark" ? "white" : "black") : "gray"}
+              />
+            ),
           }}
         />
         <Tabs.Screen
@@ -121,7 +129,9 @@ export default function TabLayout() {
           options={{
             // presentation: "modal",
             tabBarLabel: () => null,
-            tabBarIcon: ({ focused }) => <Ionicons name="add" size={24} color={focused ? "black" : "gray"} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons name="add" size={24} color={focused ? (colorScheme === "dark" ? "white" : "black") : "gray"} />
+            ),
           }}
         />
         <Tabs.Screen
@@ -136,7 +146,13 @@ export default function TabLayout() {
           }}
           options={{
             tabBarLabel: () => null,
-            tabBarIcon: ({ focused }) => <Ionicons name="heart-outline" size={24} color={focused ? "black" : "gray"} />,
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name="heart-outline"
+                size={24}
+                color={focused ? (colorScheme === "dark" ? "white" : "black") : "gray"}
+              />
+            ),
           }}
         />
         <Tabs.Screen
@@ -152,7 +168,11 @@ export default function TabLayout() {
           options={{
             tabBarLabel: () => null,
             tabBarIcon: ({ focused }) => (
-              <Ionicons name="person-outline" size={24} color={focused ? "black" : "gray"} />
+              <Ionicons
+                name="person-outline"
+                size={24}
+                color={focused ? (colorScheme === "dark" ? "white" : "black") : "gray"}
+              />
             ),
           }}
         />

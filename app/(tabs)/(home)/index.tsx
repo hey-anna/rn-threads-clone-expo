@@ -1,46 +1,91 @@
-import {
-  // usePathname,
-  useRouter,
-} from "expo-router";
-import {
-  // Dimensions,
-  //  PixelRatio,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import {} from "react-native-safe-area-context";
+import Post from "@/components/Post";
+import { useRouter } from "expo-router";
+import { StyleSheet, View, useColorScheme } from "react-native";
 
 export default function Index() {
   const router = useRouter();
-  // const pathname = usePathname();
-  // const insets = useSafeAreaInsets(); // 만약 안되는 경우 콘솔에 안되는 이유 확인해주는 역할
-
-  // console.log("pathname", pathname);
-  // console.log("insets", insets);
-
-  // const { width, height } = Dimensions.get("window");
-
-  // console.log(`화면 너비: ${width}dp, 높이: ${height}dp`);
-  // console.log(`픽셀 화면 너비: ${width * PixelRatio.get()}px, 픽셀 높이: ${height * PixelRatio.get()}px`);
+  const colorScheme = useColorScheme();
 
   return (
-    <View>
-      <View>
-        <TouchableOpacity onPress={() => router.push(`/@heyanna/post/1`)}>
-          <Text>게시글1</Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        <TouchableOpacity onPress={() => router.push(`/@heyanna/post/2`)}>
-          <Text>게시글2</Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        <TouchableOpacity onPress={() => router.push(`/@heyanna/post/3`)}>
-          <Text>게시글3</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.container, colorScheme === "dark" ? styles.containerDark : styles.containerLight]}>
+      <Post
+        item={{
+          id: "0",
+          username: "madison",
+          displayName: "Madison",
+          content: "What is this?",
+          timeAgo: "30 minutes ago",
+          likes: 10,
+          comments: 5,
+          reposts: 2,
+          isVerified: true,
+          avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+          image: `https://picsum.photos/800/600?random=${Math.random()}`,
+          location: [37.125, 124.97],
+        }}
+      />
+      <Post
+        item={{
+          id: "1",
+          username: "zerocho",
+          displayName: "Zerocho",
+          content: "Hello, world!",
+          timeAgo: "1 hour ago",
+          likes: 10,
+          comments: 5,
+          reposts: 2,
+          isVerified: true,
+          avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+        }}
+      />
+      <Post
+        item={{
+          id: "2",
+          username: "zerocho",
+          displayName: "Zerocho",
+          content: "Hello, world!",
+          timeAgo: "1 hour ago",
+          likes: 10,
+          comments: 5,
+          reposts: 2,
+          isVerified: true,
+          avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+        }}
+      />
+      <Post
+        item={{
+          id: "3",
+          username: "karina",
+          displayName: "Karina",
+          content: "Hello, world!",
+          timeAgo: "1 hour ago",
+          likes: 10,
+          comments: 5,
+          reposts: 2,
+          isVerified: true,
+          avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+          image: `https://picsum.photos/800/600?random=${Math.random()}`,
+          location: [37.125, 124.97],
+        }}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  containerLight: {
+    backgroundColor: "white",
+  },
+  containerDark: {
+    backgroundColor: "#101010",
+  },
+  textLight: {
+    color: "black",
+  },
+  textDark: {
+    color: "white",
+  },
+});
