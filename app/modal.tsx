@@ -17,6 +17,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -42,7 +43,7 @@ export function ListFooter({
         <Image source={require("../assets/images/avatar.png")} style={styles.avatarSmall} />
       </View>
       <View>
-        <Pressable onPress={addThread} style={styles.input}>
+        <Pressable onPress={addThread} style={[styles.input]}>
           <Text style={{ color: canAddThread ? "#999" : "#aaa" }}>Add to thread</Text>
         </Pressable>
       </View>
@@ -51,6 +52,7 @@ export function ListFooter({
 }
 
 export default function Modal() {
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -278,7 +280,9 @@ export default function Modal() {
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.userInfoContainer}>
-          <Text style={styles.username}>heyanna</Text>
+          <Text style={[styles.username, colorScheme === "dark" ? styles.usernameDark : styles.usernameLight]}>
+            heyanna
+          </Text>
 
           {/* 닫기버튼 : 두번째 게시글부터 닫기버튼 보이게 */}
           {index > 0 && (
@@ -305,8 +309,11 @@ export default function Modal() {
         {selectedHashtagThreadId === item.id && (
           <View style={styles.hashtagContainer}>
             <TextInput
-              // style={styles.input}
               style={{ flex: 1, borderBottomWidth: 1, borderColor: "#ccc" }}
+              // style={[
+              //   styles.input,
+              //   colorScheme === "dark" ? styles.inputDark : styles.inputLight,
+              // ]}
               placeholder="Enter a tag"
               value={hashtagInput}
               onChangeText={setHashtagInput}
@@ -401,12 +408,26 @@ export default function Modal() {
   }, [threads]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top },
+        colorScheme === "dark" ? styles.containerDark : styles.containerLight,
+      ]}
+    >
+      <View style={[styles.header, colorScheme === "dark" ? styles.headerDark : styles.headerLight]}>
         <Pressable onPress={handleCancel} disabled={isPosting}>
-          <Text style={[styles.cancel, isPosting && styles.disabledText]}>Cancel</Text>
+          <Text
+            style={[
+              styles.cancel,
+              colorScheme === "dark" ? styles.cancelDark : styles.cancelLight,
+              isPosting && styles.disabledText,
+            ]}
+          >
+            Cancel
+          </Text>
         </Pressable>
-        <Text style={styles.title}>New thread</Text>
+        <Text style={[styles.title, colorScheme === "dark" ? styles.titleDark : styles.titleLight]}>New thread</Text>
         <View style={styles.headerRightPlaceholder} />
       </View>
       <FlatList
@@ -425,8 +446,10 @@ export default function Modal() {
             }}
           />
         }
-        style={styles.list} // (전체영역) FlatList 자체 꾸미는 것도 있다
-        contentContainerStyle={{ backgroundColor: "#ddd" }} // 감싸는 영역 꾸미는거
+        style={[styles.list, colorScheme === "dark" ? styles.listDark : styles.listLight]} // (전체영역) FlatList 자체 꾸미는 것도 있다
+        contentContainerStyle={{
+          backgroundColor: colorScheme === "dark" ? "#101010" : "white",
+        }} // 감싸는 영역 꾸미는거
         keyboardShouldPersistTaps="handled" // 마이너속성, 눌렀을때 키보드뜨고, 바깥누르면 키보드 내리고
       />
       {/* RN modal */}
@@ -437,7 +460,13 @@ export default function Modal() {
         onRequestClose={() => setIsDropdownVisible(false)}
       >
         <Pressable style={styles.modalOverlay} onPress={() => setIsDropdownVisible(false)}>
-          <View style={[styles.dropdownContainer, { bottom: insets.bottom + 30 }]}>
+          <View
+            style={[
+              styles.dropdownContainer,
+              { bottom: insets.bottom + 30 },
+              colorScheme === "dark" ? styles.dropdownContainerDark : styles.dropdownContainerLight,
+            ]}
+          >
             {replyOptions.map((option) => (
               <Pressable
                 key={option}
@@ -447,7 +476,14 @@ export default function Modal() {
                   setIsDropdownVisible(false);
                 }}
               >
-                <Text style={[styles.dropdownOptionText, option === replyOption && styles.selectedOptionText]}>
+                <Text
+                  style={[
+                    styles.dropdownOptionText,
+                    colorScheme === "dark" ? styles.dropdownOptionTextDark : styles.dropdownOptionTextLight,
+
+                    option === replyOption && styles.selectedOptionText,
+                  ]}
+                >
                   {option}
                 </Text>
               </Pressable>
@@ -455,16 +491,37 @@ export default function Modal() {
           </View>
         </Pressable>
       </RNModal>
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 10 }]}>
+      <View
+        style={[
+          styles.footer,
+          { paddingBottom: insets.bottom + 10 },
+          colorScheme === "dark" ? styles.footerDark : styles.footerLight,
+        ]}
+      >
         <Pressable onPress={() => setIsDropdownVisible(true)}>
-          <Text style={styles.footerText}>{replyOption} can reply & quote</Text>
+          <Text style={[styles.footerText, colorScheme === "dark" ? styles.footerTextDark : styles.footerTextLight]}>
+            {replyOption} can reply & quote
+          </Text>
         </Pressable>
         <Pressable
-          style={[styles.postButton, !canPost && styles.postButtonDisabled]} // canPost 아닐때
+          style={[
+            styles.postButton,
+            colorScheme === "dark" ? styles.postButtonDark : styles.postButtonLight,
+
+            // !canPost && styles.postButtonDisabled
+            !canPost && (colorScheme === "dark" ? styles.postButtonDisabledDark : styles.postButtonDisabledLight),
+          ]} // canPost 아닐때
           disabled={!canPost} // canPost 아닐때
           onPress={handlePost}
         >
-          <Text style={styles.postButtonText}>Post</Text>
+          <Text
+            style={[
+              styles.postButtonText,
+              colorScheme === "dark" ? styles.postButtonTextDark : styles.postButtonTextLight,
+            ]}
+          >
+            Post
+          </Text>
         </Pressable>
       </View>
       {toast && (
@@ -481,6 +538,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+
+  containerLight: {
+    backgroundColor: "#fff",
+  },
+  containerDark: {
+    backgroundColor: "#101010",
+  },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -489,24 +554,46 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: "#fff",
   },
+  headerLight: {
+    backgroundColor: "#fff",
+  },
+  headerDark: {
+    backgroundColor: "#101010",
+  },
   headerRightPlaceholder: {
     width: 60,
   },
   cancel: {
-    color: "#000",
     fontSize: 16,
+  },
+  cancelLight: {
+    color: "#000",
+  },
+  cancelDark: {
+    color: "#fff",
   },
   disabledText: {
     color: "#ccc",
   },
   title: {
-    color: "#000",
     fontSize: 16,
     fontWeight: "600",
   },
+  titleLight: {
+    color: "#000",
+  },
+  titleDark: {
+    color: "#fff",
+  },
+
   list: {
     flex: 1,
-    backgroundColor: "#eee",
+  },
+  listLight: {
+    backgroundColor: "white",
+  },
+  listDark: {
+    backgroundColor: "#101010",
   },
   threadContainer: {
     flexDirection: "row",
@@ -551,9 +638,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#000",
   },
+  usernameLight: {
+    color: "#000",
+  },
+  usernameDark: {
+    color: "#fff",
+  },
   input: {
     fontSize: 15,
-    color: "#000",
+
     paddingTop: 4,
     paddingBottom: 8,
     minHeight: 24,
@@ -563,6 +656,12 @@ const styles = StyleSheet.create({
     //   android: "sans-serif",
     //   default: "System",
     // }),
+  },
+  inputLight: {
+    color: "#000",
+  },
+  inputDark: {
+    color: "#fff",
   },
   actionButtons: {
     flexDirection: "row",
@@ -608,41 +707,83 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  footerLight: {
+    backgroundColor: "white",
+  },
+  footerDark: {
+    backgroundColor: "#101010",
+  },
   footerText: {
     color: "#8e8e93",
     fontSize: 14,
   },
+  footerTextLight: {
+    color: "#8e8e93",
+  },
+  footerTextDark: {
+    color: "#555",
+  },
   postButton: {
     paddingVertical: 8,
     paddingHorizontal: 18,
-    backgroundColor: "#000",
     borderRadius: 18,
   },
-  postButtonDisabled: {
+  // postButtonDisabled: {
+  //   backgroundColor: "#ccc",
+  // },
+  postButtonLight: {
+    backgroundColor: "black",
+  },
+  postButtonDark: {
+    backgroundColor: "white",
+  },
+  postButtonDisabledLight: {
     backgroundColor: "#ccc",
   },
+  postButtonDisabledDark: {
+    backgroundColor: "#555",
+  },
+
   postButtonText: {
-    color: "#fff",
     fontSize: 15,
     fontWeight: "600",
   },
+  postButtonTextLight: {
+    color: "white",
+  },
+  postButtonTextDark: {
+    color: "black",
+  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.4)",
     justifyContent: "flex-end",
   },
   dropdownContainer: {
-    backgroundColor: "#fff",
+    width: 200,
     borderRadius: 10,
     marginHorizontal: 10,
     overflow: "hidden",
     marginBottom: 5,
+  },
+  dropdownContainerLight: {
+    backgroundColor: "white",
+  },
+  dropdownContainerDark: {
+    backgroundColor: "#101010",
   },
   dropdownOption: {
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderBottomWidth: StyleSheet.hairlineWidth, // 머리카락 굵기
     borderBottomColor: "#e5e5e5",
+  },
+  dropdownOptionTextLight: {
+    color: "#000",
+  },
+  dropdownOptionTextDark: {
+    color: "#fff",
   },
   selectedOption: {},
   dropdownOptionText: {

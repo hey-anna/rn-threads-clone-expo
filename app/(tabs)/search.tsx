@@ -2,23 +2,30 @@ import { AuthContext } from "@/app/_layout";
 import SideMenu from "@/components/SideMenu";
 import { Ionicons } from "@expo/vector-icons";
 import { useContext, useState } from "react";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Image, Pressable, StyleSheet, TextInput, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 // 기존 (tab)에 있을때와
 // 폴더 [usename] 만들어 index.tsx로 변경해서 넣으면 동일한 역할해준다
 // TouchableOpacity 버튼 같은거
 
 export default function Index() {
   const insets = useSafeAreaInsets();
-
   const { user } = useContext(AuthContext);
   const isLoggedIn = !!user;
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const colorScheme = useColorScheme();
+
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <View style={styles.header}>
-        {/* activity 동일구조 S */}
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+        colorScheme === "dark" ? styles.containerDark : styles.containerLight,
+      ]}
+    >
+      <View style={[styles.header, colorScheme === "dark" ? styles.headerDark : styles.headerLight]}>
         {isLoggedIn && (
           <Pressable
             style={styles.menuButton}
@@ -26,14 +33,25 @@ export default function Index() {
               setIsSideMenuOpen(true);
             }}
           >
-            <Ionicons name="menu" size={24} color="black" />
+            <Ionicons name="menu" size={24} color={colorScheme === "dark" ? "gray" : "black"} />
           </Pressable>
         )}
+        <Image source={require("../../assets/images/react-logo.png")} style={styles.logo} />
         <SideMenu isVisible={isSideMenuOpen} onClose={() => setIsSideMenuOpen(false)} />
-        {/* activity 동일구조 E */}
       </View>
-      <View style={styles.searchBar}>
-        <TextInput style={styles.searchInput} placeholder="Search" value={searchQuery} onChangeText={setSearchQuery} />
+      <View
+        style={[styles.searchBarArea, colorScheme === "dark" ? styles.searchBarAreaDark : styles.searchBarAreaLight]}
+      >
+        <View style={[styles.searchBar, colorScheme === "dark" ? styles.searchBarDark : styles.searchBarLight]}>
+          <Ionicons name="search" size={24} color={colorScheme === "dark" ? "gray" : "black"} />
+          <TextInput
+            style={[styles.searchInput, colorScheme === "dark" ? styles.searchInputDark : styles.searchInputLight]}
+            placeholder="Search"
+            placeholderTextColor={colorScheme === "dark" ? "gray" : "black"}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
       </View>
     </View>
   );
@@ -43,31 +61,71 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  logo: {
+    width: 32,
+    height: 32,
+  },
+  containerLight: {
+    backgroundColor: "white",
+  },
+  containerDark: {
+    backgroundColor: "#101010",
+  },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: "center",
     height: 50,
+  },
+  headerLight: {
+    backgroundColor: "white",
+  },
+  headerDark: {
+    backgroundColor: "#101010",
   },
   menuButton: {
     position: "absolute",
-    left: 20,
-    top: 10,
+    left: 16,
   },
-  tabBar: {
+  searchBarArea: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
   },
+  searchBarAreaLight: {
+    backgroundColor: "white",
+  },
+  searchBarAreaDark: {
+    backgroundColor: "#202020",
+  },
+
   searchBar: {
-    flex: 1,
-    justifyContent: "center",
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
     alignItems: "center",
-  },
-  searchInput: {
-    width: "90%",
-    height: 40,
+
     borderWidth: 1,
     borderColor: "gray",
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
+  },
+  searchBarLight: {
+    backgroundColor: "white",
+  },
+  searchBarDark: {
+    backgroundColor: "black",
+    color: "white",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#aaa",
+  },
+  searchInput: {
+    marginLeft: 10,
+  },
+  searchInputLight: {
+    color: "black",
+  },
+  searchInputDark: {
+    color: "white",
   },
 });

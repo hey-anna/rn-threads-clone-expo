@@ -4,23 +4,27 @@ import * as SecureStore from "expo-secure-store";
 import { createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
-interface User {
+export interface User {
   id: string;
   name: string;
-  description: string;
   profileImageUrl: string;
+  description: string;
+  link?: string;
+  showInstagramBadge?: boolean;
+  isPrivate?: boolean;
 }
 
 export const AuthContext = createContext<{
   user: User | null;
   login?: () => Promise<any>;
   logout?: () => Promise<any>;
+  updateUser?: (user: User) => void;
 }>({
   user: null,
 });
 
 export default function RootLayout() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const login = () => {
     console.log("login");
@@ -61,6 +65,11 @@ export default function RootLayout() {
     ]);
   };
 
+  const updateUser = (user: User) => {
+    setUser(user);
+    AsyncStorage.setItem("user", JSON.stringify(user));
+  };
+
   // 앱을 껏다가 켜도 로그인이 유지되어야 한다
   // 유지하기 위해
   // 만약 AsyncStorage에 유저가 있다면 setUser 해주기
@@ -73,7 +82,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <AuthContext value={{ user, login, logout }}>
+    <AuthContext value={{ user, login, logout, updateUser }}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         {/* 커스텀아이징 할때만 여기에 추가해주면 된다 */}
